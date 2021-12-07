@@ -266,18 +266,18 @@ export class CanvasRenderer extends Renderer {
         });
     }
 
-    renderReplacedElement(
+    async renderReplacedElement(
         container: ReplacedElementContainer,
         curves: BoundCurves,
         image: HTMLImageElement | HTMLCanvasElement
-    ): void {
+    ): Promise<void> {
         if (image && container.intrinsicWidth > 0 && container.intrinsicHeight > 0) {
             const box = contentBox(container);
             const path = calculatePaddingBoxPath(curves);
             this.path(path);
             this.ctx.save();
             this.ctx.clip();
-            this.ctx.drawImage(
+            await this.ctx.drawImage(
                 image,
                 0,
                 0,
@@ -304,20 +304,20 @@ export class CanvasRenderer extends Renderer {
         if (container instanceof ImageElementContainer) {
             try {
                 const image = await this.context.cache.match(container.src);
-                this.renderReplacedElement(container, curves, image);
+                await this.renderReplacedElement(container, curves, image);
             } catch (e) {
                 this.context.logger.error(`Error loading image ${container.src}`);
             }
         }
 
         if (container instanceof CanvasElementContainer) {
-            this.renderReplacedElement(container, curves, container.canvas);
+            await this.renderReplacedElement(container, curves, container.canvas);
         }
 
         if (container instanceof SVGElementContainer) {
             try {
                 const image = await this.context.cache.match(container.svg);
-                this.renderReplacedElement(container, curves, image);
+                await this.renderReplacedElement(container, curves, image);
             } catch (e) {
                 this.context.logger.error(`Error loading svg ${container.svg.substring(0, 255)}`);
             }
@@ -335,7 +335,7 @@ export class CanvasRenderer extends Renderer {
 
             const canvas = await iframeRenderer.render(container.tree);
             if (container.width && container.height) {
-                this.ctx.drawImage(
+                await this.ctx.drawImage(
                     canvas,
                     0,
                     0,
@@ -440,7 +440,7 @@ export class CanvasRenderer extends Renderer {
                     const url = (img as CSSURLImage).url;
                     try {
                         image = await this.context.cache.match(url);
-                        this.ctx.drawImage(image, container.bounds.left - (image.width + 10), container.bounds.top);
+                        await this.ctx.drawImage(image, container.bounds.left - (image.width + 10), container.bounds.top);
                     } catch (e) {
                         this.context.logger.error(`Error loading list-style-image ${url}`);
                     }

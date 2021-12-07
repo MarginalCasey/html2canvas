@@ -42,7 +42,7 @@ export class ForeignObjectRenderer extends Renderer {
             this.ctx.fillRect(0, 0, this.options.width * this.options.scale, this.options.height * this.options.scale);
         }
 
-        this.ctx.drawImage(img, -this.options.x * this.options.scale, -this.options.y * this.options.scale);
+        await this.ctx.drawImage(img, -this.options.x * this.options.scale, -this.options.y * this.options.scale);
 
         return this.canvas;
     }
